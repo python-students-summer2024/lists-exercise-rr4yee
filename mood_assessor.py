@@ -1,5 +1,4 @@
 import datetime
-import os
 
 moods = {
     "happy": 2,
@@ -9,66 +8,68 @@ moods = {
     "angry": -2
 }
 
-def mood_input():
-    while True:
-        mood = input("Please enter your current mood (happy, relaxed, apathetic, sad, angry): ").strip().lower()
-        if mood in moods:
-            return mood
-        else:
-            print("Please enter a mood from the options.")
+def user_input(mood):
+    return moods[mood]
 
-def today():
-    date_today = str(datetime.date.today())
-    if os.path.exists("data/mood_diary.txt"):
-        f = open("data/mood_diary.txt")
-        entries = f.readlines()
-        for entry in entries:
-            if entry.startswith(date_today):
-                return True
-    return False
+def mood_entries():
+    date_today = datetime.date.today() # get the date today as a date object
+    date_today = str(date_today) # convert it to a string
+    file = open("data/mood_diary.txt", "r")
+    for line in file:
+        if date_today in line:
+            print("You've already input your mood today.")
+            return
+    file.close()
+    complete = False
+    while not complete:
+        mood = input("Please enter your current mood (can be happy, relaxed, apathetic, sad, or angry): ")
+        if mood in ['happy', 'relaxed', 'apathetic', 'sad', 'angry']:
+            file = open("data/mood_diary.txt", "a")
+            file.write(f"{date_today} {(user_input(mood))}\n")
+            file.close()
+            complete = True
 
-def saving(mood):
-    date_today = str(datetime.date.today())
-    type = moods[mood]
-    os.makedirs("data", exist_ok=True)
-    f = open("data/mood_diary.txt", "a")
-    f.write(f"{date_today},{type}\n")
-    f.close()
-
-def diagnose():
-    f = open("data/mood_diary.txt", "r")
+def assess_mood():
+    mood_entries()
+    file = open("data/mood_diary.txt", "r")
     entries = file.readlines()
     file.close()
+
     if len(entries) < 7:
         return
 
     entries7 = entries[-7:]
-    type = [int(entry.split(',')[1]) for entry in entries7]
-    count = {mood: 0 for mood in moods}
+    values = [int(entry.split(' ')[1]) for entry in entries7]
+    count = {user_input(mood): 0 for mood in moods}
 
-    for value in type:
-        for mood, type in moods.items():
-            if value == type:
-                count[mood] += 1
+    for value in values:
+        count[value] += 1
 
-    if count["happy"] >= 5:
+    if count[user_input("happy")] >= 5:
         diagnosis = "manic"
-    elif count["sad"] >= 4:
-        diagnosis = "depressive"
-    elif count["apathetic"] >= 6:
+    elif count[user_input("sad")] >= 4:
+        diagnosis = "depression"
+    elif count[user_input("apathetic")] >= 6:
         diagnosis = "schizoid"
     else:
-        average = round(sum(type) / 7)
+        average = sum(values) / len(values)
+        average = round(average)
         diagnosis = [mood for mood, value in moods.items() if value == average][0]
 
     print(f"Your diagnosis: {diagnosis}!")
 
-def assess_mood():
-    if today():
-        print("Sorry, you have already entered your mood today.")
-        return
-
-    mood = mood_input()
-    saving(mood)
-    diagnoses()
-
+ # for lines in file:
+    #     lines = len(file.readlines())
+    #     if lines != 7:
+    #         break
+    #     else:
+    #         average = round(statistics.mean(file))
+    #         average = int(average)
+    #         if len(2) >= 5:
+    #             print("Your diagnosis: manic!")
+    #         elif len(-1) >= 4:
+    #             print("Your diagnosis: depressive!")
+    #         elif len(0) >= 6:
+    #             print("Your diagnosis: schizoid!")
+    #         else:
+    #             print(f"Your diagnosis: {average}.")
