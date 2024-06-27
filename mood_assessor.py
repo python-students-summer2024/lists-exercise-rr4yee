@@ -57,19 +57,3 @@ def assess_mood():
         diagnosis = [mood for mood, value in moods.items() if value == average][0]
 
     print(f"Your diagnosis: {diagnosis}!")
-
- # for lines in file:
-    #     lines = len(file.readlines())
-    #     if lines != 7:
-    #         break
-    #     else:
-    #         average = round(statistics.mean(file))
-    #         average = int(average)
-    #         if len(2) >= 5:
-    #             print("Your diagnosis: manic!")
-    #         elif len(-1) >= 4:
-    #             print("Your diagnosis: depressive!")
-    #         elif len(0) >= 6:
-    #             print("Your diagnosis: schizoid!")
-    #         else:
-    #             print(f"Your diagnosis: {average}.")
